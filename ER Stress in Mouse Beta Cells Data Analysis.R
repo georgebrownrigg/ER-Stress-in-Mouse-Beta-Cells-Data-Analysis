@@ -4802,4 +4802,261 @@ ggplot(data_interaction_M_plotted_Sig_FC, ggplot2::aes(x = Index)) +
     legend.background = ggplot2::element_rect(fill = alpha("white", 0)),
     aspect.ratio = 1.5 / 2)
 
+## Fig S3 ## - #correlation plot
+
+#clear environment
+rm(list = ls())
+                            
+library(corrplot)
+HPAP = read.csv(file="Z:/Dropbox (Personal)/Johnson Lab/HPAP/HPAP Correlation.csv",row.names = 1)
+colnames(HPAP) = c('Sex', 'Age (Yr)','BMI','HbA1c','Diabetes.Status','AA+3 mM G','AA+16.7 mM G', 'AA+16.7 mM G+IBMX','30 mM KCl','Total Secretion')
+HPAP$Sex = as.factor(HPAP$Sex)
+HPAP$Sex = as.numeric(HPAP$Sex)
+colnames(HPAP)[5] = 'Diabetes Status'
+ND = HPAP[HPAP$`Diabetes Status` == 'ND',]
+T2D = HPAP[HPAP$`Diabetes Status` == 'T2D',]
+
+ND = ND[-5]
+T2D = T2D[-5]
+
+HPAP$`Diabetes Status` = as.factor(HPAP$`Diabetes Status`)
+HPAP$`Diabetes Status` = as.numeric(HPAP$`Diabetes Status`)
+
+
+Male.ND = ND[ND$Sex == '2',]
+Female.ND = ND[ND$Sex == '1',]
+
+Male.ND = Male.ND[-1]
+Female.ND = Female.ND[-1]
+
+
+cor.mtest <- function(mat, ...) {
+  mat <- as.matrix(mat)
+  n <- ncol(mat)
+  p.mat<- matrix(NA, n, n)
+  diag(p.mat) <- 0
+  for (i in 1:(n - 1)) {
+    for (j in (i + 1):n) {
+      tmp <- cor.test(mat[, i], mat[, j], ...)
+      p.mat[i, j] <- p.mat[j, i] <- tmp$p.value
+    }
+  }
+  colnames(p.mat) <- rownames(p.mat) <- colnames(mat)
+  p.mat
+}
+# matrix of the p-value of the correlation
+col<-colorRampPalette(color = c("blue", "white", "red"))(10)
+
+T2D$HbA1c = as.numeric(T2D$HbA1c)
+T2D = na.omit(T2D)
+p.mat.T2D <- cor.mtest(T2D)
+corrplot(cor(T2D), 
+         method="color", 
+         col = col,
+         #addCoef.col = "black",
+         number.cex = .81,
+         type = 'lower',
+         # addCoef.col = 'black',
+         p.mat = p.mat.T2D,  
+         sig.level = -1,
+         insig = "p-value",
+         pch.cex = 1.62,
+         pch.col = "black",
+         tl.col = 'black',
+         tl.cex = .81,
+         diag = FALSE)
+mtext("Correlation Coefficient", side = 1, cex=.81,line = 4, at = 4.5)
+
+
+ND$HbA1c = as.numeric(ND$HbA1c)
+ND = na.omit(ND)
+p.mat.ND <- cor.mtest(ND)
+corrplot(cor(ND), 
+         method="color", 
+         col = col,
+         #addCoef.col = "black",
+         number.cex = .81,
+         type="lower",
+         # Combine with significance
+         p.mat = p.mat.ND,  
+         sig.level = -1,
+         insig = "p-value",
+         pch.cex = 1.62,
+         pch.col = "black",
+         tl.col = 'black',
+         tl.cex = .81,
+         # hide correlation coefficient on the principal diagonal
+         diag=FALSE
+)
+mtext("Correlation Coefficient", side = 1, cex=.81,line = 4, at = 4.5)
+
+trace(corrplot, edit=TRUE)
+
+HPAP$HbA1c = as.numeric(HPAP$HbA1c)
+HPAP = na.omit(HPAP)
+p.mat.HPAP <- cor.mtest(HPAP)
+corrplot(cor(HPAP), 
+         method="color", 
+         col = col,
+         #addCoef.col = "black",
+         number.cex = .81,
+         type="lower",
+         # Combine with significance
+         p.mat = p.mat.HPAP, 
+         insig = "p-value",
+         pch.cex = 1.62,
+         pch.col = "black",
+         sig.level = -1,
+         tl.col = 'black',
+         tl.cex = .81,
+         # hide correlation coefficient on the principal diagonal
+         diag=FALSE
+)
+mtext("Correlation Coefficient", side = 1, cex=.81,line = 4, at = 4.5)
+
+
+
+Male = HPAP[HPAP$Sex == '2',]
+Female = HPAP[HPAP$Sex == '1',]
+Male = Male[-1]
+Female = Female[-1]
+
+Male$HbA1c = as.numeric(Male$HbA1c)
+Male = na.omit(Male)
+p.mat.Male <- cor.mtest(Male)
+corrplot(cor(Male), 
+         method = 'color',
+         col = col,
+         number.cex = .81,
+         sig.level = -1,
+         type = 'lower',
+         # addCoef.col = 'black',
+         p.mat = p.mat.Male,
+         pch.cex = 1.62,
+         pch.col = "black",
+         tl.col = 'black',
+         tl.cex = .81,
+         diag = FALSE,
+         insig = 'p-value')
+mtext("Correlation Coefficient", side = 1, cex=.81,line = 4, at = 4.5)
+
+Female$HbA1c = as.numeric(Female$HbA1c)
+Female = na.omit(Female)
+p.mat.Female <- cor.mtest(Female)
+corrplot(cor(Female), 
+         method = "color", 
+         col = col,
+         number.cex = .81,
+         type = 'lower',
+         # addCoef.col = 'black',
+         p.mat = p.mat.Female,  
+         sig.level = -1,
+         insig = "p-value",
+         pch.cex = 1.62,
+         pch.col = "black",
+         tl.col = 'black',
+         tl.cex = .81,
+         diag = FALSE)
+mtext("Correlation Coefficient", side = 1, cex=.81,line = 4, at = 4.5)
+
+
+#Sex vs. Condition
+library(ggplot2)
+Correlations = HPAP[c(1,6:10)]
+attach(mtcars)
+par(mfrow=c(3,2))
+
+F1 = ggplot(Correlations, aes(x = Sex,
+                         y = `AA+3 mM G`)) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"))+
+  geom_smooth(method="lm") +
+  geom_point() +
+  stat_cor(aes(label = ..p.label..), label.x=1.5, label.y=0.5)+
+  geom_label(label = 'Female',
+             x = 1.15,
+             y = 0.5)+
+  geom_label(label = 'Male',
+             x = 1.9,
+             y = 0.5)
+
+F2 = ggplot(Correlations, aes(x = Sex,
+                         y = `AA+16.7 mM G`)) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"))+
+  geom_smooth(method="lm") +
+  geom_point() +
+  stat_cor(aes(label = ..p.label..), label.x=1.5, label.y=0.75)+
+  geom_label(label = 'Female',
+             x = 1.15,
+             y = 0.5)+
+  geom_label(label = 'Male',
+             x = 1.9,
+             y = 0.5)
+
+F3 = ggplot(Correlations, aes(x = Sex,
+                         y = `AA+16.7 mM G+IBMX`)) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"))+
+  geom_smooth(method="lm") +
+  geom_point() +
+  stat_cor(aes(label = ..p.label..), label.x=1.5, label.y=1.5)+
+  geom_label(label = 'Female',
+             x = 1.15,
+             y = 0.5)+
+  geom_label(label = 'Male',
+             x = 1.9,
+             y = 0.5)
+
+F4 = ggplot(Correlations, aes(x = Sex,
+                         y = `30 mM KCl`)) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"))+
+  geom_smooth(method="lm") +
+  geom_point() +
+  stat_cor(aes(label = ..p.label..), label.x=1.5, label.y=0.6)+
+  geom_label(label = 'Female',
+             x = 1.15,
+             y = 0.5)+
+  geom_label(label = 'Male',
+             x = 1.9,
+             y = 0.5)
+
+
+F5 = ggplot(Correlations, aes(x = Sex,
+                         y = `Total Secretion`)) +
+  theme(axis.text.x=element_blank(),
+        axis.ticks.x=element_blank(),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        axis.line = element_line(colour = "black"))+
+  geom_smooth(method="lm") +
+  geom_point() +
+  stat_cor(aes(label = ..p.label..), label.x=1.5, label.y=3)+
+  geom_label(label = 'Female',
+             x = 1.15,
+             y = 0.5)+
+  geom_label(label = 'Male',
+             x = 1.9,
+             y = 0.5)
+
+ggarrange(F1,F2,F3,F4,F5 + rremove("x.text"), 
+          ncol = 3, nrow = 2)
 
